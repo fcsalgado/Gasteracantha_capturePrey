@@ -1,0 +1,548 @@
+---
+title: "prey_capture_Gasteracantha"
+author: "Fabian C. Salgado-Roa"
+date: "22/19/2023"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    toc_depth: 5
+    highlight: tango
+    theme: paper
+    self_contained: yes
+    mode: selfcontained
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+## Load the libraries and standard error function
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(glmmTMB)
+library(car)
+library(DHARMa)
+```
+
+Standard error function 
+
+```{r}
+se <- function(x) sd(x)/sqrt(length(x))
+```
+
+## Load the datasets
+
+Total dataset
+
+```{r, message=FALSE, warning=FALSE}
+tmp_noNA<-read_csv("data_gasteracantha.csv",col_names=T)
+```
+
+Treat time as a categorical variable
+
+```{r, message=FALSE, warning=FALSE}
+tmp_noNA$Time<-as.character(tmp_noNA$Time)
+```
+
+Let's create subset excluding the empty web observations. This will facilitate the comparisons between colour morphs
+
+```{r, message=FALSE, warning=FALSE}
+tmp_ind<-tmp_noNA %>% filter(colour!="empty")
+```
+
+Because the measures are repeated for each individual, lets create a subset with a single observation to explore association between colour morph and the variables measured
+
+```{r}
+unique_ind <- tmp_noNA %>% distinct(code, .keep_all=T)
+unique_noEmpty<-unique_ind %>% filter(colour!="empty")
+```
+
+# Association between the predictors
+
+Check the normality of the variables per colour category (including empty web when possible)
+
+```{r results='hide'}
+#Web height
+hist(unique_ind$Web_height)
+qqPlot(unique_ind$Web_height,groups=factor(unique_ind$colour))
+#opisthosoma width
+hist(unique_noEmpty$opisto_w)
+qqPlot(unique_noEmpty$opisto_w)
+#web Area
+hist(log(unique_ind$web_area+10))
+qqPlot(log(unique_ind$web_area+10),groups=factor(unique_ind$colour))
+```
+
+It seems that all the variables are following a normal distribution in every colour category
+
+# Linear models
+
+**Web height** 
+
+Run the linear model
+
+```{r}
+mod_webHeight<-lm(Web_height~colour,data=unique_ind)
+#plot(mod_webHeight)
+```
+
+Check the significance of the predictor
+
+```{r}
+summary(mod_webHeight)
+anova(mod_webHeight)
+```
+
+**Opisthosoma width** 
+
+Run the linear model
+
+```{r}
+mod_opistoW<-lm(opisto_w~colour,data=unique_noEmpty)
+#plot(mod_opistoW)
+```
+
+Check the significance of the predictor
+
+```{r}
+summary(mod_opistoW)
+anova(mod_opistoW)
+```
+
+*Opisthosoma width seems to differ between colour morphs*
+
+**Web area** 
+
+Run the linear model
+
+```{r}
+mod_webArea<-lm(sqrt(web_area+10)~colour,data=unique_ind)
+```
+
+Check the assumptions of the linear model
+
+```{r}
+plot(mod_webArea)
+shapiro.test(mod_webArea$residuals)
+```
+
+*everything seems ok*
+
+Check the significance of the predictor
+
+```{r}
+summary(mod_webArea)
+anova(mod_webArea)
+```
+
+*get the summary value per colour morph*
+
+```{r}
+unique_ind %>% group_by(colour) %>% summarize(num(mean(web_area),digits=2),se(web_area))
+unique_ind %>% group_by(colour) %>% summarize(num(mean(Web_height),digits=2),se(Web_height))
+unique_ind %>% filter(colour!="empty") %>% drop_na(opisto_w) %>% group_by(colour) %>% summarize(num(mean(opisto_w),digits=2),se(opisto_w))
+```
+
+
+*Because we found that the colour morphs differ in their opisthosoma width, we explored if this predictor is associated with prey capture*
+
+**model with negative binomial distribution**
+
+Run the model
+
+```{r}
+capture_opistoW<-glmmTMB(formula=total_preys ~ opisto_w + (1|code) + (1|check),
+       family="nbinom2",REML=T,data=tmp_ind)
+```
+
+Check the uniformity, dispersion and zero inflation of the model
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = capture_opistoW, n = 1000)
+testDispersion(simulationOutput = simulationOutput, alternative ="two.sided")
+testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
+testZeroInflation(simulationOutput = simulationOutput, alternative ="two.sided")
+```
+
+*everything seems ok*
+
+Check the significance of the predictor
+
+```{r}
+Anova(capture_opistoW)
+```
+
+*Because width is not related with prey capture, which is the variable we are interested in, we decided to remove it for the subsequent analyses*
+
+**Web area and web height present collinearity**
+
+Run the model
+
+```{r}
+mod_webArea_Heigth<-lm(sqrt(web_area+10)~Web_height,data=unique_ind)
+```
+
+Check the assumptions of the linear model
+
+```{r}
+plot(mod_webArea_Heigth)
+shapiro.test(mod_webArea_Heigth$residuals)
+```
+
+*everything seems ok*
+
+Check the significance of the predictor
+
+```{r}
+summary(mod_webArea_Heigth)
+Anova(mod_webArea_Heigth)
+```
+
+# Light differences between sides and colour morphs
+
+**Light measures are bimodal, in consequences we decided to this variable as binary (high or low). This categorization can be explore **
+
+
+```{r}
+paleta<-c("#636363","#f0f0f0","#ffeda0")
+
+ggplot(data=tmp_noNA, aes(x=log(luxes*100), group=colour, fill=colour)) +
+    geom_density(adjust=1.5, alpha=.4) +
+    scale_fill_manual(values=paleta)+
+    scale_x_continuous(limits=c(0,12))+
+    theme_classic()
+```
+
+**We explore if there were differences between sides in the exposure to a certain light condition**
+
+Run the model
+
+```{r}
+light_side<-glmmTMB(formula=b_luxes ~ Side+ (1|code)+(1|day),family="binomial",data=tmp_ind)
+```
+
+Check the significance of the predictor
+
+```{r}
+summary(light_side)
+Anova(light_side)
+```
+
+We found that the ventral side is more often expose to conditions of high luminosity. Let's visualize the results
+
+```{r}
+#Predict the values based on the model
+tmp_ind$light_side<-predict(light_side,type="response")
+#Colours
+paleta_side<-c("#B84C7A","#BCA7D2")
+#Plot
+ggplot(data = tmp_ind,aes(x=Side,y=light_side, fill=Side))+
+scale_y_continuous(limits=c(0,1))+
+     scale_fill_manual(values=paleta_side)+
+     scale_colour_manual(values=paleta_side)+
+     stat_summary(fun = mean,aes(color = Side,group=Side),fun.min = function(x) mean(x) - (2*se(x)),fun.max = function(x) mean(x)+(2*se(x)),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5)+
+     theme_classic()
+```
+
+**We also tested if the colour morphs differ in which side is expose to the different light environments**
+
+
+Run the model with yellow and ventral as fixed levels
+
+```{r}
+tmp_ind$colour<-relevel(as.factor(tmp_ind$colour),"yellow")
+tmp_ind$Side<-relevel(as.factor(tmp_ind$Side),"ventral")
+colour_light1<-glmmTMB(formula=b_luxes ~ Side*colour + (1|code) + (1|day) ,family="binomial",data=tmp_ind)
+```
+
+Check the significance of the predictor
+
+```{r}
+summary(colour_light1)
+Anova(colour_light1,type=3)
+```
+
+Run the model with black and dorsal as fixed levels
+
+```{r}
+tmp_ind$colour<-relevel(as.factor(tmp_ind$colour),"black")
+tmp_ind$Side<-relevel(as.factor(tmp_ind$Side),"dorsal")
+colour_light2<-glmmTMB(formula=b_luxes ~ Side*colour + (1|code) + (1|day),
+       family="binomial",data=tmp_ind)
+```
+
+Check the significance of the predictors
+
+```{r}
+summary(colour_light2)
+Anova(colour_light2,type=3)
+```
+
+Let's visualize the results
+
+```{r}
+#Predict the values based on the model
+tmp_ind$predicted_light<-predict(colour_light1,type="response")
+#Colours
+tmp_ind$colour<-relevel(as.factor(tmp_ind$colour),"white")
+tmp_ind$Side<-relevel(as.factor(tmp_ind$Side),"dorsal")
+paleta2<-c("#f0f0f0","#636363","#ffeda0")
+#Plot
+ggplot(data = tmp_ind,aes(x=Side,y=predicted_light, fill=Side))+
+scale_y_continuous(limits=c(0,1))+
+     scale_fill_manual(values=paleta2)+
+     scale_colour_manual(values=paleta2)+
+     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - (2*se(x)),fun.max = function(x) mean(x)+(2*se(x)),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5)+
+     theme_classic()
+```
+
+## Side filtering and analyses (Make this look pretty)
+
+we compared dorsal and ventral light measures of each individual, where the higher measure was considered as open space and the lower measure as vegetation. We did this for everyday of observation. The following code will create a new dataset.
+
+```{r}
+unique_ind2<-data.frame()
+for(d in unique(tmp_ind$day)){
+       sub<-tmp_ind %>% filter(day==d & Time==6.3)
+       unique_ind2<-rbind(unique_ind2,sub)
+}
+side_data<-tibble(code=character(),side=character(),open_space=numeric(),day=numeric())
+for(d in unique(unique_ind2$day)){
+       filtered_day<-unique_ind2 %>% filter(day==d)
+       tmp<-tibble(code=character(),side=character(),open_space=numeric(),day=numeric())
+       for(ind in unique(filtered_day$code)) {
+              dorsal<-filtered_day %>% filter(code==ind & Side=="dorsal")
+              ventral<-filtered_day %>% filter(code==ind & Side=="ventral")
+              if(nrow(ventral)==0 | nrow(dorsal)==0){next}
+              else if(ventral$luxes>dorsal$luxes){
+                     ventral<-tibble(code=ind,side="ventral",open_space=1,day=d)
+                     dorsal<-tibble(code=ind,side="dorsal",open_space=0,day=d)
+                     tmp<-rbind(tmp,ventral,dorsal)
+              } else if(ventral$luxes<dorsal$luxes){
+                     ventral<-tibble(code=ind,side="ventral",open_space=0,day=d)
+                     dorsal<-tibble(code=ind,side="dorsal",open_space=1,day=d)
+                     tmp<-rbind(tmp,ventral,dorsal)
+              } 
+       }
+side_data<-rbind(side_data,tmp)
+}
+
+```
+
+Let's evaluate if the new categorization is independent of how the spider position its body towards the different light conditions (High or Low luminosity)
+
+```{r}
+test_association<-chisq.test(factor(unique_ind2$t_luxes),factor(unique_ind2$site_exp))
+test_association
+```
+
+Because we did not find association, let's run an independent model
+
+```{r}
+open_side<-glmmTMB(formula=open_space ~ side+ (1|day) + (1|code),family="binomial",data=side_data) #test which side is most
+```
+
+Check the model's fit
+
+```{r , message=FALSE, warning=FALSE, results = 'hide'}
+simulationOutput <- simulateResiduals(fittedModel = open_side, n = 1000)
+testDispersion(simulationOutput = simulationOutput, alternative ="two.sided")
+testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
+```
+
+Check the significance of the predictor
+
+```{r}
+summary(open_side)
+Anova(open_side)
+```
+
+# Capture models
+
+## Effect of the presence of the colour morphs on the web
+
+**We explored the effect of the presence of the presence of the spiders on the web. We also included the presence of silk decorations as a predictor**
+
+```{r}
+tmp_noNA$colour<-relevel(as.factor(tmp_noNA$colour),"empty")
+tmp_noNA$Time<-relevel(as.factor(tmp_noNA$Time),"6.3")
+with_control_model<-glmmTMB(formula=total_preys ~ colour+sqrt(web_area+10)+presence_decorations + check + (1|code) + (1|day/Time),family="poisson",REML=F,data=tmp_noNA) 
+```
+
+Check the uniformity, dispersion and zero inflation of the model
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = with_control_model, n = 10000)
+testDispersion(simulationOutput = simulationOutput, alternative ="two.sided")
+testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
+testZeroInflation(simulationOutput = simulationOutput, alternative ="two.sided")
+```
+
+**Because there is not uniformity when using a poisson distribution, we run the model again with a poisson distribution**
+
+```{r}
+tmp_noNA$colour<-relevel(as.factor(tmp_noNA$colour),"empty")
+tmp_noNA$Time<-relevel(as.factor(tmp_noNA$Time),"6.3")
+with_control_model<-glmmTMB(formula=total_preys ~ colour+sqrt(web_area+10)+presence_decorations + check + (1|code) + (1|day/Time),family="nbinom2",REML=F,data=tmp_noNA) 
+```
+
+Check the uniformity, dispersion and zero inflation of the model
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = with_control_model, n = 10000)
+testDispersion(simulationOutput = simulationOutput, alternative ="two.sided")
+testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
+testZeroInflation(simulationOutput = simulationOutput, alternative ="two.sided")
+```
+
+*everything seems ok*
+
+Check the significance of the predictors
+
+```{r}
+summary(with_control_model)
+Anova(with_control_model)
+```
+
+*the presence of any of the colour morphs on the web seems to reduce the capture of prey*
+
+```{r}
+paleta2<-c("#648ace","#636363","#f0f0f0","#ffeda0")
+#pdf("dorsal.pdf",height=8,width=10)
+tmp_noNA$total_response<-predict(with_control_model,type="response")
+ggplot(data = tmp_noNA,aes(x=colour,y=total_response))+
+     geom_point(data = tmp_noNA,aes(x=colour,y=total_preys, fill=colour),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
+       scale_fill_manual(values=paleta2)+
+  stat_summary(fun = mean,aes(group=colour,col=colour),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", size=1.5,shape=21,col="black",fill=paleta2)+
+     theme_classic()
+
+```
+
+
+## Explore the differences on prey capture considering side and colour morph
+
+Run the model with white and ventral as fixed levels
+
+```{r}
+tmp_ind$colour<-relevel(as.factor(tmp_ind$colour),"white")
+tmp_ind$Side<-relevel(as.factor(tmp_ind$Side),"ventral")
+tmp_ind$Time<-relevel(as.factor(tmp_ind$Time),"6.3")
+total_model_poisson<-glmmTMB::glmmTMB(formula=total_preys ~ Side+colour+t_luxes+sqrt(web_area+10)+ check + (1|code) + (1|day/Time),family="poisson",REML=F,data=tmp_ind)
+```
+
+### Poisson model
+
+```{r}
+total_model_poisson<-glmmTMB::glmmTMB(formula=total_preys ~ Side+colour+t_luxes+sqrt(web_area+10)+ check + (1|code) + (1|day/Time),family="poisson",REML=F,data=tmp_ind)
+```
+
+
+Test the fit of the model and zero inflation
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = total_model_poisson, n = 10000)
+testDispersion(simulationOutput = simulationOutput, alternative ="two.sided")
+testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
+testZeroInflation(simulationOutput = simulationOutput, alternative ="two.sided")
+```
+
+**Because this model has no uniformity; its is necessary to try other model that takes this into account**
+
+
+### Negative binomial model
+
+
+```{r}
+total_model_nb<-glmmTMB::glmmTMB(formula=total_preys ~ colour+Side+t_luxes+sqrt(web_area+10)+ check + (1|code) + (1|day/Time),family="nbinom2",REML=F,data=tmp_ind)
+```
+
+Test the fit of the model and zero inflation
+
+```{r}
+simulationOutput <- simulateResiduals(fittedModel = total_model_nb, n = 10000)
+testDispersion(simulationOutput = simulationOutput, alternative ="two.sided")
+testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
+testZeroInflation(simulationOutput = simulationOutput, alternative ="two.sided")
+```
+
+This model seems to be ok, let's now check the significance of the predictors
+
+```{r}
+summary(total_model_nb)
+Anova(total_model_nb)
+```
+
+To create the plot for the results, we have to predict the values under the model
+
+```{r}
+#Predict values to plot
+tmp_ind$response_nb<-predict(total_model_nb,type="response")
+```
+
+**With this, we can create two plots, one per side in order to make easy to visualize the results**
+
+###Plot dorsal
+
+Create subset
+
+```{r}
+plot_dorsal <- tmp_ind %>% filter(Side=="dorsal")
+plot_dorsal$colour<-relevel(as.factor(plot_dorsal$colour),"black")
+```
+
+Plot the results
+
+```{r}
+#Colours
+paleta2<-c("#636363","#f0f0f0","#ffeda0")
+#plot
+ggplot(data = plot_dorsal,aes(x=t_luxes,y=response_nb, fill=colour))+
+     geom_point(data = plot_dorsal,aes(x=t_luxes,y=total_preys, fill=colour),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
+       scale_fill_manual(values=paleta2)+
+     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5, shape=21, col="black")+
+     theme_classic()
+
+```
+
+###Plot ventral
+
+Create subset
+
+```{r}
+plot_ventral <- tmp_ind %>% filter(Side=="ventral")
+plot_ventral$colour<-relevel(as.factor(plot_ventral$colour),"black")
+```
+
+Plot the results
+
+```{r}
+#Colours
+paleta2<-c("#636363","#f0f0f0","#ffeda0")
+#plot
+ggplot(data = plot_ventral,aes(x=t_luxes,y=response_nb, fill=colour))+
+     geom_point(data = plot_ventral,aes(x=t_luxes,y=total_preys, fill=colour),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
+       scale_fill_manual(values=paleta2)+
+     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5, shape=21, col="black")+
+     theme_classic()
+
+```
+
+###Plot by light condition
+
+```{r}
+#Colours
+paleta2<-c("#c5dd8f","#5db23a")
+#pdf("light_prey.pdf",height=8,width=10)
+#plot
+ggplot(data = plot_dorsal,aes(x=t_luxes,y=response_nb, fill=t_luxes))+
+     geom_point(data = plot_dorsal,aes(x=t_luxes,y=total_preys, fill=t_luxes),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
+       scale_fill_manual(values=paleta2)+
+     stat_summary(fun = mean,aes(color = t_luxes,group=t_luxes),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", size=1.5, shape=21, col="black")+
+     theme_classic()
+
+```
