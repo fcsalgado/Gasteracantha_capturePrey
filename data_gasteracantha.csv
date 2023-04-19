@@ -1,7 +1,7 @@
 code,Side,Time,Preys_web,Preys_eating,Prey_remains,Preys_ID,silk_d,day,opisto_w,web_area,number_silk,Web_height,site_exp,check,colour,luxes,total_preys,t_luxes,colourSide,presence_decorations,b_luxes
-B5,ventral,6.3,0,0,0,0,0,1,8.5,545.0663254,0,150,ventral,M,white,110,0,high,white_ventral,no,1
+B5,ventral,6.3,0,0,0,NA,0,1,8.5,545.0663254,0,150,ventral,M,white,110,0,high,white_ventral,no,1
 B7,ventral,6.3,1,1,0,coleoptera,3,1,10.4,416.2610266,3,160,ventral,M,white,0.88,2,low,white_ventral,yes,0
-A8,ventral,6.3,0,0,0,0,0,1,12.78,485.376065,0,85,ventral,E,yellow,0.68,0,low,yellow_ventral,no,0
+A8,ventral,6.3,0,0,0,NA,0,1,12.78,485.376065,0,85,ventral,E,yellow,0.68,0,low,yellow_ventral,no,0
 B10,dorsal,6.3,1,1,0,diptera,0,1,7.8,293.7389131,0,80,dorsal,M,white,0.6,2,low,white_dorsal,no,0
 B11,ventral,6.3,1,0,1,diptera,2,1,NA,463.3849164,2,120,ventral,M,white,0.7,1,low,white_ventral,yes,0
 A12,dorsal,6.3,0,1,NA,diptera,0,1,11.6,278.0309498,0,133,ventral,E,yellow,0.53,1,low,yellow_dorsal,no,0
@@ -329,7 +329,7 @@ B7,ventral,10.3,0,1,0,NA,3,1,10.4,416.2610266,3,160,ventral,M,white,0.88,1,low,w
 A8,dorsal,10.3,2,0,0,diptera,0,1,12.78,485.376065,0,85,ventral,E,yellow,0.29,2,low,yellow_dorsal,no,0
 A8,ventral,10.3,1,0,0,diptera,0,1,12.78,485.376065,0,85,ventral,E,yellow,0.68,1,low,yellow_ventral,no,0
 N4,ventral,10.3,0,1,NA,lepidoptera,2,1,11.6,293.7389131,2,160,ventral,M,black,0.58,1,low,black_ventral,yes,0
-N2,ventral,10.3,1,0,0,0,2,1,10,395.8406744,2,140,dorsal,M,black,0.25,1,low,black_ventral,yes,0
+N2,ventral,10.3,1,0,0,NA,2,1,10,395.8406744,2,140,dorsal,M,black,0.25,1,low,black_ventral,yes,0
 B35,ventral,10.3,2,0,NA,NA,0,1,10.25,144.5132621,0,76,ventral,E,white,101,2,high,white_ventral,no,1
 N16,dorsal,10.3,1,0,NA,diptera,0,1,8.76,197.9203372,0,70,ventral,F,black,0.21,1,low,black_dorsal,no,0
 B50,dorsal,10.3,1,0,NA,diptera,2,1,9.6,256.0398013,2,73,ventral,F,white,0.11,1,low,white_dorsal,yes,0
@@ -676,7 +676,7 @@ N8,ventral,9.3,0,0,0,NA,3,2,9.2,395.8406744,3,190,dorsal,M,black,0.43,0,low,blac
 N9.1,dorsal,9.3,0,0,0,NA,0,2,NA,271.7477645,0,130,ventral,M,black,0.18,0,low,black_dorsal,no,0
 N9.1,ventral,9.3,0,0,0,NA,0,2,NA,271.7477645,0,130,ventral,M,black,168,0,high,black_ventral,no,1
 B1.1,ventral,10.3,1,0,0,coleoptera,0,2,NA,339.2920066,0,60,dorsal,M,white,0.25,1,low,white_ventral,no,0
-B2,ventral,10.3,0,0,0,0,0,2,8.6,387.9866927,0,190,ventral,M,white,114,0,high,white_ventral,no,1
+B2,ventral,10.3,0,0,0,NA,0,2,8.6,387.9866927,0,190,ventral,M,white,114,0,high,white_ventral,no,1
 N1,ventral,10.3,1,0,1,diptera,0,2,6.7,226.1946711,0,90,dorsal,M,black,0.48,1,low,black_ventral,no,0
 B46,dorsal,10.3,3,0,NA,diptera,3,2,10.7,805.8185156,3,166,ventral,E,white,0.25,3,low,white_dorsal,yes,0
 A18,dorsal,10.3,1,0,NA,hemiptera,0,2,NA,382.0962065,0,63,dorsal,E,yellow,0.85,1,low,yellow_dorsal,no,0
@@ -1346,12 +1346,12 @@ N22,ventral,10.3,0,0,0,NA,0,4,9.98,502.6548246,0,60,dorsal,M,black,0.21,0,low,bl
 B21.2.4,dorsal,6.3,1,0,0,diptera,3,5,8.6,376.9911184,3,40,ventral,M,white,0.11,1,low,white_dorsal,yes,0
 B21.2.4,ventral,6.3,4,0,0,diptera,3,5,8.6,376.9911184,3,40,ventral,M,white,0.6,4,low,white_ventral,yes,0
 B13.4,dorsal,6.3,2,0,0,diptera,0,5,10.2,387.9866927,0,150,ventral,M,white,0.67,2,low,white_dorsal,no,0
-A14.4,dorsal,6.3,2,0,0,0,0,5,8.8,263.8937829,0,130,dorsal,M,white,205,2,high,white_dorsal,no,1
+A14.4,dorsal,6.3,2,0,0,NA,0,5,8.8,263.8937829,0,130,dorsal,M,white,205,2,high,white_dorsal,no,1
 A14.4,ventral,6.3,3,0,0,diptera,0,5,8.8,263.8937829,0,130,dorsal,M,white,0.35,3,low,white_ventral,no,0
 A8,ventral,6.3,1,0,0,diptera,0,5,12.78,387.9866927,0,120,dorsal,M,yellow,0.14,1,low,yellow_ventral,no,0
 A13.1,ventral,6.3,1,0,1,diptera,3,5,10.6,545.0663254,3,180,dorsal,M,yellow,0.65,1,low,yellow_ventral,yes,0
 B9.5,dorsal,6.3,2,0,NA,NA,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.94,2,low,white_dorsal,no,0
-B9.5,ventral,6.3,2,0,0,diperta,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.16,2,low,white_ventral,no,0
+B9.5,ventral,6.3,2,0,0,diptera,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.16,2,low,white_ventral,no,0
 A14.4.1,dorsal,6.3,2,0,NA,diptera,2,5,10.7,188.4955592,2,110,dorsal,F,yellow,0.2,2,low,yellow_dorsal,yes,0
 B100,dorsal,6.3,4,0,NA,diptera,0,5,11.5,315.7300617,0,100,ventral,F,white,0.36,4,low,white_dorsal,no,0
 A32.5,ventral,6.3,1,0,NA,diptera,0,5,11.4,424.1150082,0,190,dorsal,F,yellow,0.21,1,low,yellow_ventral,no,0
@@ -1404,7 +1404,7 @@ N25,dorsal,6.3,0,0,0,NA,0,5,6.4,285.8849315,0,80,dorsal,M,black,102,0,high,black
 N25,ventral,6.3,0,0,0,NA,0,5,6.4,285.8849315,0,80,dorsal,M,black,0.66,0,low,black_ventral,no,0
 N26,dorsal,6.3,0,0,0,NA,3,5,10.5,301.5928947,3,140,ventral,M,black,0.16,0,low,black_dorsal,yes,0
 N26,ventral,6.3,0,0,0,NA,3,5,10.5,301.5928947,3,140,ventral,M,black,0.25,0,low,black_ventral,yes,0
-B9.5,ventral,8.3,2,0,0,dipera,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.16,2,low,white_ventral,no,0
+B9.5,ventral,8.3,2,0,0,diptera,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.16,2,low,white_ventral,no,0
 A14.4,dorsal,8.3,2,0,0,diptera,0,5,8.8,263.8937829,0,130,dorsal,M,white,205,2,high,white_dorsal,no,1
 A14.4,ventral,8.3,1,0,0,hymenoptera,0,5,8.8,263.8937829,0,130,dorsal,M,white,0.35,1,low,white_ventral,no,0
 A16,ventral,8.3,1,0,NA,diptera,0,5,12.3,215.1990968,0,130,ventral,F,yellow,420,1,high,yellow_ventral,no,1
@@ -1475,7 +1475,7 @@ B13.4,ventral,10.3,3,0,0,diptera,0,5,10.2,387.9866927,0,150,ventral,M,white,176,
 A14.4,dorsal,10.3,4,0,0,diptera,0,5,8.8,263.8937829,0,130,dorsal,M,white,205,4,high,white_dorsal,no,1
 A14.4,ventral,10.3,4,0,0,diptera,0,5,8.8,263.8937829,0,130,dorsal,M,white,0.35,4,low,white_ventral,no,0
 B9.5,dorsal,10.3,2,0,NA,NA,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.94,2,low,white_dorsal,no,0
-B9.5,ventral,10.3,4,0,0,dipera,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.16,4,low,white_ventral,no,0
+B9.5,ventral,10.3,4,0,0,diptera,0,5,10.9,191.2601608,0,108,dorsal,E,white,0.16,4,low,white_ventral,no,0
 A8,ventral,10.3,4,0,0,diptera,0,5,12.78,387.9866927,0,120,dorsal,M,yellow,0.14,4,low,yellow_ventral,no,0
 A13.1,ventral,10.3,1,0,1,diptera,3,5,10.6,545.0663254,3,180,dorsal,M,yellow,0.65,1,low,yellow_ventral,yes,0
 A14.4.1,dorsal,10.3,2,0,NA,diptera,2,5,10.7,188.4955592,2,110,dorsal,F,yellow,0.2,2,low,yellow_dorsal,yes,0
@@ -1591,7 +1591,7 @@ B50,dorsal,6.3,0,0,0,NA,0,6,9.6,241.9026343,0,120,dorsal,M,white,0.43,0,low,whit
 B50,ventral,6.3,0,0,0,NA,0,6,9.6,241.9026343,0,120,dorsal,M,white,0.16,0,low,white_ventral,no,0
 N26,dorsal,6.3,0,0,0,NA,0,6,10.5,326.725636,0,210,dorsal,M,black,0.32,0,low,black_dorsal,no,0
 N26,ventral,6.3,0,0,0,NA,0,6,10.5,326.725636,0,210,dorsal,M,black,0.14,0,low,black_ventral,no,0
-B21.2.4,ventral,8.3,0,0,0,diptera,0,6,8.6,301.5928947,0,110,ventral,M,white,0.64,0,low,white_ventral,no,0
+B21.2.4,ventral,8.3,0,0,0,NA,0,6,8.6,301.5928947,0,110,ventral,M,white,0.64,0,low,white_ventral,no,0
 A13,ventral,8.3,1,0,1,homoptera,0,6,8.53,387.9866927,0,110,dorsal,M,yellow,0.18,1,low,yellow_ventral,no,0
 A41.4,dorsal,8.3,1,0,NA,diptera,2,6,11.3,207.3451151,2,100,ventral,F,yellow,0.64,1,low,yellow_dorsal,yes,0
 N19,dorsal,8.3,1,0,NA,NA,0,6,11.1,645.5972903,0,200,ventral,F,black,0.32,1,low,black_dorsal,no,0
@@ -1976,7 +1976,7 @@ RV1,empty,6.3,0,0,0,NA,0,5,NA,339.6689977,0,120,ventral,E,empty,0,0,low,empty_em
 RV2,empty,6.3,0,0,0,NA,0,5,NA,140.5862712,0,110,ventral,E,empty,0,0,low,empty_empty,no,0
 RV4,empty,6.3,0,0,0,NA,0,5,NA,144.9059611,0,100,ventral,E,empty,0,0,low,empty_empty,no,0
 B50,empty,8.3,2,0,0,hymenoptera,0,5,NA,424.1150082,0,140,NA,M,empty,0,2,low,empty_empty,no,0
-B66.1,empty,8.3,4,0,0,0,0,5,NA,351.8583772,0,140,NA,M,empty,0,4,low,empty_empty,no,0
+B66.1,empty,8.3,4,0,0,NA,0,5,NA,351.8583772,0,140,NA,M,empty,0,4,low,empty_empty,no,0
 R5,empty,8.3,2,0,NA,diptera,2,5,NA,125.6637061,2,100,NA,F,empty,0,2,low,empty_empty,yes,0
 R6,empty,8.3,1,0,NA,diptera,2,5,NA,235.619449,2,90,NA,F,empty,0,1,low,empty_empty,yes,0
 RV3,empty,8.3,2,0,NA,diptera,0,5,NA,205.8999825,0,130,ventral,E,empty,0,2,low,empty_empty,no,0
@@ -2009,7 +2009,7 @@ R10,empty,6.3,0,0,0,NA,0,6,NA,188.4955592,0,120,NA,F,empty,0,0,low,empty_empty,n
 R1,empty,6.3,0,0,0,NA,0,6,NA,237.1902453,0,120,NA,F,empty,0,0,low,empty_empty,no,0
 R6,empty,6.3,0,0,0,NA,0,6,NA,163.362818,0,100,NA,F,empty,0,0,low,empty_empty,no,0
 R5,empty,6.3,0,0,0,NA,2,6,NA,164.9336143,2,100,NA,F,empty,0,0,low,empty_empty,yes,0
-B66.1,empty,8.3,4,0,0,0,0,6,NA,281.1725425,0,110,NA,M,empty,0,4,low,empty_empty,no,0
+B66.1,empty,8.3,4,0,0,NA,0,6,NA,281.1725425,0,110,NA,M,empty,0,4,low,empty_empty,no,0
 B54,empty,8.3,4,0,0,diptera,0,6,NA,351.8583772,0,180,NA,M,empty,0,4,low,empty_empty,no,0
 R1,empty,8.3,1,0,NA,diptera,0,6,NA,237.1902453,0,120,NA,F,empty,0,1,low,empty_empty,no,0
 R6,empty,8.3,3,0,NA,diptera,0,6,NA,163.362818,0,100,NA,F,empty,0,3,low,empty_empty,no,0
