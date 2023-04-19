@@ -215,7 +215,7 @@ ggplot(data=tmp_noNA, aes(x=log(luxes*100), group=colour, fill=colour)) +
     geom_density(adjust=1.5, alpha=.4) +
     scale_fill_manual(values=paleta)+
     scale_x_continuous(limits=c(0,12))+
-    theme_classic()
+    theme_classic()+labs(y="Density",x="Log(lux*100)")
 ```
 
 **We explore if there were differences between sides in the exposure to a certain light condition**
@@ -246,7 +246,7 @@ scale_y_continuous(limits=c(0,1))+
      scale_fill_manual(values=paleta_side)+
      scale_colour_manual(values=paleta_side)+
      stat_summary(fun = mean,aes(color = Side,group=Side),fun.min = function(x) mean(x) - (2*se(x)),fun.max = function(x) mean(x)+(2*se(x)),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5)+
-     theme_classic()
+     theme_classic()+labs(x="Spider side",y="Light environment")
 ```
 
 **We also tested if the colour morphs differ in which side is expose to the different light environments**
@@ -293,15 +293,15 @@ tmp_ind$colour<-relevel(as.factor(tmp_ind$colour),"white")
 tmp_ind$Side<-relevel(as.factor(tmp_ind$Side),"dorsal")
 paleta2<-c("#f0f0f0","#636363","#ffeda0")
 #Plot
-ggplot(data = tmp_ind,aes(x=Side,y=predicted_light, fill=Side))+
-scale_y_continuous(limits=c(0,1))+
+ggplot(data = tmp_ind,aes(x=Side,y=predicted_light, fill=colour))+
+scale_y_continuous(limits=c(0,1))+labs(x="Spider side",y="Light environment")+
      scale_fill_manual(values=paleta2)+
      scale_colour_manual(values=paleta2)+
-     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - (2*se(x)),fun.max = function(x) mean(x)+(2*se(x)),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5)+
+     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - (2*se(x)),fun.max = function(x) mean(x)+(2*se(x)),geom = "pointrange", shape=22,col="black",position = position_jitterdodge(jitter.width=0.15), size=1)+
      theme_classic()
 ```
 
-## Side filtering and analyses (Make this look pretty)
+## Side filtering and analyses
 
 we compared dorsal and ventral light measures of each individual, where the higher measure was considered as open space and the lower measure as vegetation. We did this for everyday of observation. The following code will create a new dataset.
 
@@ -383,7 +383,7 @@ testUniformity(simulationOutput = simulationOutput, alternative ="two.sided")
 testZeroInflation(simulationOutput = simulationOutput, alternative ="two.sided")
 ```
 
-**Because there is not uniformity when using a poisson distribution, we run the model again with a poisson distribution**
+**Because there is not uniformity of the residuals when using a poisson distribution, we run the model again with a negative binomial distribution**
 
 ```{r}
 tmp_noNA$colour<-relevel(as.factor(tmp_noNA$colour),"empty")
@@ -416,10 +416,11 @@ paleta2<-c("#648ace","#636363","#f0f0f0","#ffeda0")
 #pdf("dorsal.pdf",height=8,width=10)
 tmp_noNA$total_response<-predict(with_control_model,type="response")
 ggplot(data = tmp_noNA,aes(x=colour,y=total_response))+
-     geom_point(data = tmp_noNA,aes(x=colour,y=total_preys, fill=colour),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
-       scale_fill_manual(values=paleta2)+
-  stat_summary(fun = mean,aes(group=colour,col=colour),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", size=1.5,shape=21,col="black",fill=paleta2)+
-     theme_classic()
+  geom_point(data = tmp_noNA,aes(x=colour,y=total_preys, fill=colour),shape = 21,size=3, position = position_jitterdodge(jitter.width=0.2,jitter.height=0.1),alpha=0.5)+
+  scale_fill_manual(values=paleta2)+
+  geom_violin(aes(x=colour,y=total_response,fill=colour),alpha=0.3,size=0.4)+scale_color_manual(values=paleta2)+
+  stat_summary(fun = mean,aes(group=colour,col=colour),fun.min = function(x) mean(x) - sd(x),fun.max = function(x) mean(x)+sd(x),geom = "pointrange",linewidth = 2,size=1.5,shape=22,col="black",fill=paleta2)+
+theme_classic()+labs(x="Colour",y="Number of prey capture per hour")
 
 ```
 
@@ -474,7 +475,7 @@ This model seems to be ok, let's now check the significance of the predictors
 
 ```{r}
 summary(total_model_nb)
-Anova(total_model_nb)
+Anova(total_model_nb,type = 3)
 ```
 
 To create the plot for the results, we have to predict the values under the model
@@ -501,11 +502,14 @@ Plot the results
 #Colours
 paleta2<-c("#636363","#f0f0f0","#ffeda0")
 #plot
+#pdf("dorsal.pdf",height=8,width=10)
+
 ggplot(data = plot_dorsal,aes(x=t_luxes,y=response_nb, fill=colour))+
      geom_point(data = plot_dorsal,aes(x=t_luxes,y=total_preys, fill=colour),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
        scale_fill_manual(values=paleta2)+
-     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5, shape=21, col="black")+
-     theme_classic()
+  #geom_violin(aes(fill=colour),alpha=0.3,size=0.4)+scale_color_manual(values=paleta2)+
+     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - sd(x),fun.max = function(x) mean(x)+sd(x),geom = "pointrange", position = position_jitterdodge(jitter.width=0.01), linewidth = 2,size=1.5,shape=22, col="black")+
+     theme_classic()+labs(x="Light environment",y="Number of prey capture per hour")
 
 ```
 
@@ -527,8 +531,9 @@ paleta2<-c("#636363","#f0f0f0","#ffeda0")
 ggplot(data = plot_ventral,aes(x=t_luxes,y=response_nb, fill=colour))+
      geom_point(data = plot_ventral,aes(x=t_luxes,y=total_preys, fill=colour),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
        scale_fill_manual(values=paleta2)+
-     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", position = position_jitterdodge(jitter.width=0.15), size=1.5, shape=21, col="black")+
-     theme_classic()
+  #geom_violin(aes(fill=colour),alpha=0.3,size=0.4)+scale_color_manual(values=paleta2)+
+     stat_summary(fun = mean,aes(color = colour,group=colour),fun.min = function(x) mean(x) - sd(x),fun.max = function(x) mean(x)+sd(x),geom = "pointrange", position = position_jitterdodge(jitter.width=0.01), linewidth = 2,size=1.5,shape=22, col="black")+
+     theme_classic()+labs(x="Light environment",y="Number of prey capture per hour")
 
 ```
 
@@ -540,9 +545,26 @@ paleta2<-c("#c5dd8f","#5db23a")
 #pdf("light_prey.pdf",height=8,width=10)
 #plot
 ggplot(data = plot_dorsal,aes(x=t_luxes,y=response_nb, fill=t_luxes))+
-     geom_point(data = plot_dorsal,aes(x=t_luxes,y=total_preys, fill=t_luxes),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=1.0)+
+     geom_point(data = plot_dorsal,aes(x=t_luxes,y=total_preys, fill=t_luxes),shape = 21,size=4, position = position_jitterdodge(jitter.width=0.15,jitter.height=0.1),alpha=0.2)+
        scale_fill_manual(values=paleta2)+
-     stat_summary(fun = mean,aes(color = t_luxes,group=t_luxes),fun.min = function(x) mean(x) - 2*se(x),fun.max = function(x) mean(x)+2*se(x),geom = "pointrange", size=1.5, shape=21, col="black")+
-     theme_classic()
+     stat_summary(fun = mean,aes(color = t_luxes,group=t_luxes),fun.min = function(x) mean(x) - sd(x),fun.max = function(x) mean(x)+sd(x),geom = "pointrange", size=1.5, shape=22, col="black")+
+     theme_classic()+labs(x="Light environment",y="Number of prey capture per hour")
 
 ```
+
+
+### some supplementary plots
+
+```{r}
+tmp_ind %>% filter(total_preys>0) %>% drop_na(Preys_ID) %>% pull(Preys_ID) %>% table() %>% prop.table()
+
+preys<-tmp_ind %>% filter(total_preys>0) %>% drop_na(Preys_ID) %>% select(colour,Preys_ID,total_preys) %>% uncount(total_preys)
+
+prop.table(table(preys$Preys_ID))*100
+
+paleta2<-c("#f0f0f0","#636363","#ffeda0")
+preys %>% ggplot(aes(x=Preys_ID,fill=colour)) + geom_bar(aes(y = after_stat((count/sum(count))*100)),colour="black") + scale_fill_manual(values=paleta2)+theme_classic()+scale_y_continuous(breaks=seq(0,100,10))+labs(y="Percentage of idenfied",x="Prey order")
+
+```
+
+
